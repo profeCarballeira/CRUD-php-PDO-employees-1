@@ -1,27 +1,29 @@
 <?php
+    include "protect.php";
+?>
+
+<?php
 // Check existence of id parameter before processing further
 if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
     // Include config file
     require_once "config.php";
     
     // Prepare a select statement
-    $sql = "SELECT * FROM employees WHERE id = ?";
+    $sql = "SELECT * FROM employees WHERE id = :id";
     
-    if($stmt = mysqli_prepare($link, $sql)){
+    if($stmt = $pdo->prepare($sql)){
         // Bind variables to the prepared statement as parameters
-        mysqli_stmt_bind_param($stmt, "i", $param_id);
+        $stmt->bindParam(":id", $param_id);
         
         // Set parameters
         $param_id = trim($_GET["id"]);
         
         // Attempt to execute the prepared statement
-        if(mysqli_stmt_execute($stmt)){
-            $result = mysqli_stmt_get_result($stmt);
-    
-            if(mysqli_num_rows($result) == 1){
+        if($stmt->execute()){
+            if($stmt->rowCount() == 1){
                 /* Fetch result row as an associative array. Since the result set
                 contains only one row, we don't need to use while loop */
-                $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
                 
                 // Retrieve individual field value
                 $name = $row["name"];
@@ -39,10 +41,10 @@ if(isset($_GET["id"]) && !empty(trim($_GET["id"]))){
     }
      
     // Close statement
-    mysqli_stmt_close($stmt);
+    unset($stmt);
     
     // Close connection
-    mysqli_close($link);
+    unset($pdo);
 } else{
     // URL doesn't contain id parameter. Redirect to error page
     header("location: error.php");

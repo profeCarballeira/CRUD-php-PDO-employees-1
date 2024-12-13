@@ -28,7 +28,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Check input errors before inserting in databaseogin.php
     if(empty($name_err) && empty($password_err)){
         
-        $sql = "SELECT * FROM accounts WHERE user = :user";
+        $sql = "SELECT * FROM accounts WHERE name = :user";
         if($stmt = $pdo->prepare($sql)){
             // Bind variables to the prepared statement as parameters
             $stmt->bindParam(":user", $name);
@@ -41,8 +41,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     $row = $stmt->fetch(PDO::FETCH_ASSOC);
                 
                     // Retrieve individual field value
-                    echo $row["user"] . $row["pass"];
-                    if ($password ==  $row["pass"]){
+                    echo $row["user"] . $row["password"];
+                    if ($password ==  $row["password"]){
                         session_start();
                         $_SESSION["user"]= "ok";
                         unset($pdo);
